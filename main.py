@@ -5,7 +5,7 @@ con.baudrate = 115200
 con.bytesize = 8  # Number of data bits = 8
 con.parity = 'N'  # No parity
 con.stopbits = 1  # Number of Stop bits = 1
-con.timeout = 0.001
+con.timeout = 0.1
 
 
 def handle_packet(header, length, data):
@@ -36,13 +36,15 @@ def handle_packet(header, length, data):
 try:
     while True:
         header = con.read(1).hex()
-        if header == 0xf6:
+        if header == 'f6':
             lengthHex = con.read(1).hex()
+            if lengthHex == '':
+                continue
             length = int(lengthHex, 16)
             data = con.read(length - 1).hex()
             print(header + lengthHex + data)
-            handle_packet(header, lengthHex, data)
-        else:
+            #handle_packet(header, lengthHex, data)
+        elif header != "":
             print("None f6 recieved! " + header)
 except KeyboardInterrupt:
     con.close()  # Close the Com port
