@@ -9,57 +9,21 @@ con.timeout = 0.001
 
 str = ''
 
+
 def handle_str(packet_str):
-    if packet_str.startswith("f618ffff"):
-        p1 = packet_str
-        #print("p1")
-    elif packet_str.startswith("f636b6"):
-        p1 = packet_str
-        #print("p2")
-    elif packet_str.startswith("f607dc"):
-        p1 = packet_str
-        #print("p3")
-    elif packet_str.startswith("f622dcff"): # Something score related
-        p1 = packet_str
-        print(p1)
-    elif packet_str.startswith("f614dc"):
-        p1 = packet_str
-        #print("p5")
-    elif packet_str.startswith("f60bdc"):
-        p1 = packet_str
-        #print("p6")
-    elif packet_str.startswith("f60cdc"):
-        p1 = packet_str
-        #print("p7")
-    elif packet_str.startswith("f6d6"):
-        p1 = packet_str
-        #print("p8")
-    elif packet_str.startswith("f6c6"): #Similar to above?
-        p1 = packet_str
-        #print("p9")
-    elif packet_str.startswith("f686"): #Full packet?
-        p1 = packet_str
-        #print("p10")
-    elif packet_str.startswith("f6969"):
-        p1 = packet_str
-        #print("p11")
-    else:
-        print(packet_str)
+    if packet_str.startswith("f607"):
+        print("07")
 
 
-while True:
-    bytes = con.read(1)
-    hex = bytes.hex()
-    if bytes:
-        str += bytes.hex()
-
-        if str.count("f6") == 2:
-            start = str.index("f6")
-            nxtI = start+4
-            has = str.find("f6", nxtI) != -1
-            end = str.index("f6", nxtI) if has else len(str)
-            packet_str = str[start: end]
-            handle_str(packet_str)
-            str = str[end:]
-
-con.close()  # Close the Com port
+try:
+    while True:
+        header = con.read(1).hex()
+        if header == 0xf6:
+            lengthHex = con.read(1).hex()
+            length = int(lengthHex, 16)
+            data = con.read(length - 1).hex()
+            print("f6" + lengthHex + data)
+        else:
+            print("None f6 recieved! " + header)
+except KeyboardInterrupt:
+    con.close()  # Close the Com port
